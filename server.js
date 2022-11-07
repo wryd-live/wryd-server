@@ -58,7 +58,7 @@ app.get('/api/city',(req,res)=>{
 
 
 app.get("*",(req,res)=>{
-    res.send("Error 404");
+    res.send("Error 404 - Page Not Found");
 });
 
 
