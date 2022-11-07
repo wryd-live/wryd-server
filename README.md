@@ -4,7 +4,7 @@ WRYD App Server
 ### Pre-requisite
 
 * [Node Js](https://nodejs.org/en/)
-
+* [MySQL Server+Workbench](https://dev.mysql.com/downloads/installer/)
 
 
 ### Setup
