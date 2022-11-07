@@ -1,0 +1,5 @@
+PORT = 80
+HOST = localhost
+USER = root
+PASSWORD = password
+DATABASE = wryd
