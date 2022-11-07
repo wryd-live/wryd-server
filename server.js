@@ -15,10 +15,10 @@ const port = process.env.PORT || 80;
 
 
 var mysqlConnection = mysql.createConnection({
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
+    host: process.env.DBHOST,
+    user: process.env.DBUSER,
+    password: process.env.DBPASSWORD,
+    database: process.env.DBNAME,
     multipleStatements : true
 });
 
