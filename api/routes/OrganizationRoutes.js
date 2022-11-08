@@ -1,6 +1,6 @@
 const express=require("express");
 const Router=express.Router();
-const mysqlConnection=require("../connection");
+const mysqlConnection=require("../utils/connection");
 
 Router.get("/",(req,res)=>{
     mysqlConnection.query("SELECT * FROM organization",(err,rows,fields)=>{
