@@ -1,8 +1,10 @@
 const express = require("express")
-const mysql = require("mysql")
 const bodyParser = require("body-parser");
+const mysqlConnection=require("./connection");
 require('dotenv').config();
 
+//Routes Variables
+const allUsersRoutes=require("./Routes/UserRoutes");
 
 
 const app = express()
@@ -10,29 +12,12 @@ const app = express()
 app.use(bodyParser.json());
 app.set('json spaces', 2);
 
+app.use("/api/user/all",allUsersRoutes);
 
 const port = process.env.PORT || 80;
 
 
-var mysqlConnection = mysql.createConnection({
-    host: process.env.DBHOST,
-    user: process.env.DBUSER,
-    password: process.env.DBPASSWORD,
-    database: process.env.DBNAME,
-    multipleStatements : true
-});
 
-
-mysqlConnection.connect((err)=>{
-    if(!err)
-    {
-        console.log("Database Connected!");
-    }
-    else
-    {
-        console.log("Database Connection Failed!");
-    }
-})
 
 
 app.get('/',(req,res)=>{
