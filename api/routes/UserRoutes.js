@@ -21,7 +21,7 @@ Router.get("/all/:orgid",(req,res)=>{
 
     const orgid=req.params.orgid;
 
-    mysqlConnection.query("SELECT user.id, user.name,user.organization,user.verified,user.imageurl FROM user INNER JOIN organization ON user.organization=organization.id WHERE organization.id='"+orgid+"'",(err,rows,fields)=>{
+    mysqlConnection.query("SELECT user.id, user.name,user.organization,user.verified,user.imageurl FROM user WHERE user.organization='"+orgid+"'",(err,rows,fields)=>{
         if(!err)
         {
             res.send(rows);
