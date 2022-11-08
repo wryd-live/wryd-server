@@ -19,7 +19,7 @@ Router.get("/view/:id",(req,res)=>{
 
     const orgid=req.params.id;
     
-    mysqlConnection.query("SELECT organization.username,organization.name,organization.domain FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
+    mysqlConnection.query("SELECT * FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
         if(!err)
         {
             res.send(rows);
