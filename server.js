@@ -12,6 +12,7 @@ const app = express()
 app.use(bodyParser.json());
 app.set('json spaces', 2);
 
+//Routing
 app.use("/api/user/all",allUsersRoutes);
 
 const port = process.env.PORT || 80;
