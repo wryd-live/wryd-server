@@ -1,6 +1,6 @@
 const express = require("express")
 const bodyParser = require("body-parser");
-const mysqlConnection=require("./connection");
+const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
 
 //Routes Variables
