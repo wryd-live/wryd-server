@@ -30,4 +30,20 @@ Router.get("/view/:id",(req,res)=>{
         }
     })
 })
+
+Router.get("/delete/:id",(req,res)=>{
+
+    const orgid=req.params.id;
+    
+    mysqlConnection.query("DELETE FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
+        if(!err)
+        {
+            res.send(rows);
+        }
+        else
+        {
+            console.log(err);
+        }
+    })
+})
 module.exports=Router;
