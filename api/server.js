@@ -3,8 +3,9 @@ const bodyParser = require("body-parser");
 const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
 
-//Routes Variables
 const user_routes =require("./routes/UserRoutes");
+const organization_routes =require("./Routes/OrganizationRoutes");
+
 
 
 const app = express()
@@ -12,8 +13,9 @@ const app = express()
 app.use(bodyParser.json());
 app.set('json spaces', 2);
 
-//Routing
+
 app.use("/api/user",user_routes);
+app.use("/api/organization/",organization_routes);
 
 const port = process.env.PORT || 80;
 
