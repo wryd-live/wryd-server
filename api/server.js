@@ -4,7 +4,7 @@ const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
 
 const user_routes =require("./routes/UserRoutes");
-const organization_routes =require("./Routes/OrganizationRoutes");
+const organization_routes =require("./routes/OrganizationRoutes");
 
 
 
