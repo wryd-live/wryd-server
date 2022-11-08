@@ -4,7 +4,7 @@ const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
 
 //Routes Variables
-const allUsersRoutes=require("./Routes/UserRoutes");
+const user_routes =require("./routes/UserRoutes");
 
 
 const app = express()
@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.set('json spaces', 2);
 
 //Routing
-app.use("/api/user/all",allUsersRoutes);
+app.use("/api/user",user_routes);
 
 const port = process.env.PORT || 80;
 
