@@ -48,4 +48,27 @@ Router.get("/all/view/:id",(req,res)=>{
         }
     })
 })
+
+Router.get("/all/delete/:id",(req,res)=>{
+
+    const userid=req.params.id;
+    mysqlConnection.query("DELETE FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
+        if(!err)
+        {
+            if(rows["affectedRows"]==0)
+            {
+                res.send("User not found by given id");
+            }
+            else
+            {
+                res.send("User Deleted Successfully");
+            }
+        }
+        else
+        {
+            console.log(err);
+        }
+    }) 
+})
+
 module.exports=Router;
