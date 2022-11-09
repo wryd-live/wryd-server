@@ -48,7 +48,6 @@ Router.post('/create', function (req, res) {
             }
             else if(myerr==1048)
             {
-                res.status(404);
                 res.json(
                     {
                         code: 1700,
@@ -91,10 +90,20 @@ Router.get("/view/:id",(req,res)=>{
     mysqlConnection.query("SELECT * FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
         if(!err)
         {
-            res.send(rows);
+            if(rows.length != 0)
+            {
+                res.send(rows);
+            }
+            else
+            {
+                res.sendStatus(404);
+            }
+            
         }
         else
         {
+            res.status(404);
+            res.sendStatus(404);
             console.log(err);
         }
     })
