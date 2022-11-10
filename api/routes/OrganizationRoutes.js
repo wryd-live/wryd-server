@@ -8,19 +8,7 @@ Router.post('/create', function (req, res) {
     console.log(username);
     console.log(name);
     console.log(domain);
-    /*
-    // validate request
-    if(!req.body){
-        res.status(404);
-        res.json(
-            {
-                code: 1700,
-                msg: "Empty Field"
-            }
-        );
-        return;
-    }
-    */
+
     mysqlConnection.query("INSERT INTO organization (username, name, domain) VALUES (?, ?, ?)", [username,name,domain],(err, rows, fields)=>{
         if(!err)
         {
@@ -79,6 +67,7 @@ Router.get("/all",(req,res)=>{
         else
         {
             console.log(err);
+            res.sendStatus(404);
         }
     })
 })
@@ -102,7 +91,6 @@ Router.get("/view/:id",(req,res)=>{
         }
         else
         {
-            res.status(404);
             res.sendStatus(404);
             console.log(err);
         }
@@ -121,6 +109,7 @@ Router.get("/delete/:id",(req,res)=>{
         else
         {
             console.log(err);
+            res.sendStatus(404);
         }
     })
 })
