@@ -1,5 +1,7 @@
 const express = require("express")
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
+
 const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
 
@@ -12,6 +14,8 @@ const app = express()
 
 app.use(bodyParser.json());
 app.set('json spaces', 2);
+
+app.use(morgan('dev'))
 
 
 app.use("/api/user",user_routes);
