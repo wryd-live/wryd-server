@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const user_routes =require("./routes/UserRoutes");
 const organization_routes =require("./routes/OrganizationRoutes");
+const search_route = require("./routes/SearchRoute");
 
 
 
@@ -20,6 +21,7 @@ app.use(morgan('dev'))
 
 app.use("/api/user",user_routes);
 app.use("/api/organization/",organization_routes);
+app.use("/api/search/",search_route);
 
 const port = process.env.PORT || 80;
 
