@@ -72,30 +72,43 @@ Router.get("/all",(req,res)=>{
     })
 })
 
-Router.get("/view/:id",(req,res)=>{
 
-    const orgid=req.params.id;
-    
-    mysqlConnection.query("SELECT * FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
-        if(!err)
-        {
-            if(rows.length != 0)
+
+function getOrgById(orgId)
+{
+    return new Promise(resolve=>{
+
+        mysqlConnection.query("SELECT * FROM organization WHERE organization.id=?",[orgId],(err,rows,fields)=>{
+            if(!err && rows.length!=0)
             {
-                res.send(rows);
+                // 0        1
+                //[rows , error]
+                resolve([rows,null]);
             }
             else
             {
-                res.sendStatus(404);
+                resolve([null,404]);
             }
-            
-        }
-        else
-        {
-            res.sendStatus(404);
-            console.log(err);
-        }
-    })
+        })
+    });
+}
+
+
+Router.get("/view/:id",async (req,res)=>{
+
+    const orgid=req.params.id;
+    
+    let rowsOutput =  await getOrgById(orgid);
+    if(rowsOutput[1])
+    {
+        res.sendStatus(404);
+    }
+    else
+    {
+        res.send(rowsOutput[0]);
+    }
 })
+
 
 Router.get("/delete/:id",(req,res)=>{
 
