@@ -5,8 +5,14 @@ const mysqlConnection = require("../utils/connection");
 Router.get("/:userid",(req,res)=>{
 
     const userid = req.params.userid;
+    const query_string = `SELECT notification.notificationid,notification.type,notification.personid,notification.time,user.name as person_name,user.imageurl
+    FROM notification
+    INNER JOIN user
+    ON notification.personid = user.id
+    where userid = ?
+    ORDER BY time DESC`
 
-    mysqlConnection.query("SELECT * FROM notification WHERE notification.userid=? ORDER BY time DESC",[userid],(err,rows,fields)=>{
+    mysqlConnection.query(query_string,[userid],(err,rows,fields)=>{
         if(!err)
         {
             if(rows.length != 0)
