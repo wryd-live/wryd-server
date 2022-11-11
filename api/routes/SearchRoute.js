@@ -12,7 +12,7 @@ Router.get("/:name/:userid", (req, res) => {
     console.log(searchedExpression);
     const query_string = `SELECT user.id,user.name,user.imageurl
     FROM user
-    where user.organization = (select user.organization from user where user.id = ?) and user.name LIKE ?  && user.id != ?`
+    where user.organization = (select user.organization from user where user.id = ?) and user.name LIKE ?  && user.id != ? and user.verified != 0`
     mysqlConnection.query(query_string,[userid,searchedExpression,userid],(err, rows, fields) => {
         if (!err) {
             if(rows.length != 0)
