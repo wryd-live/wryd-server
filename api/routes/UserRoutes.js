@@ -4,121 +4,104 @@ const mysqlConnection=require("../utils/connection");
 var validator=require('validator');
 const crypto=require("crypto");
 
-function SendEmail(name,email,verificationKey){
-    return true;
-}
-
 function CreateVerificationKey()
 {
     const verificationKey=crypto.randomBytes(64).toString('hex');
     return verificationKey;
 }
 
-function CheckEmailDomain(email,orgainization_id)
+function CheckEmailDomain(email,organization_id)
 {
-    mysqlConnection.query("SELECT domain FROM organization WHERE id=?",[orgainization_id],(err,rows,fields)=>{
-        const orgDomain=rows;
-    })
-    const userDomain=email.split("@")[1];
-}
-
-
-Router.post('/create', function (req, res) {
-    var postData = req.body;
-    const {name,email,password,orgainization_id} = postData;
-
-    if(name=="" || email=="" || password=="" || name == null || email==null || password==null)
-    {
-        // res.statusCode(2001).send("Invalid Format Name | Password | Email ");
-        res.send("Invalid");
-        return;
-    }
-    
-    
-    
-    if(validator.isAlpha(name,undefined,{ignore: " "}) && validator.isEmail(email)  && validator.isStrongPassword(password))
-    {
-
-        const verificationKey=CreateVerificationKey();
-        var sentEmail=SendEmail(name,email,verificationKey);
-        if(sentEmail)
-        {
-            console.log("Email Sent Successfuly");
-        }
-        else
-        {
-            console.log("Some Error occured while sending email");
-        }
-    }
-    else{
-        res.statusCode(2001).send("Invalid Format Name | Password | Email ");
-    }
-
-
-
-    // console.log(username);
-    // console.log(name);
-    // console.log(domain);
-    /*
-    // validate request
-    if(!req.body){
-        res.status(404);
-        res.json(
-            {
-                code: 1700,
-                msg: "Empty Field"
-            }
-        );
-        return;
-    }
-    */
-    mysqlConnection.query("INSERT INTO organization (username, name, domain) VALUES (?, ?, ?)", [username,name,domain],(err, rows, fields)=>{
+    return myPromise = new Promise(myResolve => {
+    let orgDomain;
+    mysqlConnection.query("SELECT domain FROM organization WHERE id=?",[organization_id],(err,rows,fields)=>{
         if(!err)
         {
-            res.json(
-                {
-                    code: 1200,
-                    msg: "Organization Created"
-                }    
-            );
+            orgDomain=rows[0]["domain"];
+            const userDomain=email.split('@')[1];
+            if (orgDomain===userDomain) {
+                myResolve(true);
+            } else {
+                myResolve(false);
+            }
         }
         else
         {
             console.log(err);
-            const myerr = err.errno;
-            res.status(404);
+            myResolve(false);
+        }
+    })
+    });
+}
 
-            if(myerr==1062)
+Router.post('/create', async(req, res) => {
+    var postData=req.body;
+    const {name,email,password,organization_id}=postData;
+    
+    
+    if(name=="" || email=="" || password=="" || name == null || email==null || password==null)
+    {
+        res.status(404);
+        res.json({
+            code:2001,
+            msg:"Invalid Format Name | Password | Email"
+        })
+        return;
+    }
+
+    const isDomainValid= await CheckEmailDomain(email,organization_id);
+    let verificationKey;
+    if(!isDomainValid)
+    {
+        res.status(404);
+        res.json({
+            code:2004,
+            msg:"Invalid Orgainization_Domain"
+        })
+        return;
+    }
+    else
+    {
+        verificationKey=CreateVerificationKey();
+        const imageurl= `https://api.multiavatar.com/${name}`;
+        mysqlConnection.query("INSERT INTO user (name,email,password,organization,verification_key,imageurl) VALUES (?,?,?,?,?,?)",[name,email,password,organization_id,verificationKey,imageurl],(err,rows,fields)=>{
+            if(err)
             {
-                res.json(
-                    {
-                        code: 1500,
-                        msg: "Organization Already Exists"
-                    }
-                );
-            }
-            else if(myerr==1048)
-            {
-                res.json(
-                    {
-                        code: 1700,
-                        msg: "Empty Field"
-                    }
-                );
-                return;  
+                const myerr = err.errno;
+                res.status(404);
+
+                if(myerr==1062)
+                {
+                    res.json(
+                        {
+                            code: 2002,
+                            msg: "Email Already Exists"
+                        }
+                    );
+                }
+                else
+                {
+                    res.json(
+                        {
+                            code: 2003,
+                            msg: "Other Error"
+                        }
+                    );
+                }
             }
             else
             {
-                res.json(
-                    {
-                        code: 1600,
-                        msg: "Internal Error"
-                    }
-                );
+                //user inserted
+                // var ans = sendEmailVerificationLink(name,email,verificationKey,req);
+                var ans = true;
+                
+                res.json({
+                    code:200,
+                    msg: "User Created Successfully"
+                })
             }
-            
-        }
-    })
+        });
+    }
 })
 
 Router.get("/all",(req,res)=>{
