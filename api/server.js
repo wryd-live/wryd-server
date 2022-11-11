@@ -9,6 +9,7 @@ const user_routes =require("./routes/UserRoutes");
 const organization_routes =require("./routes/OrganizationRoutes");
 const search_route = require("./routes/SearchRoute");
 const notification_route = require("./routes/NotificationRoute");
+const location_route = require("./routes/LocationRoute")
 
 
 
@@ -24,6 +25,7 @@ app.use("/api/user",user_routes);
 app.use("/api/organization/",organization_routes);
 app.use("/api/search/",search_route);
 app.use("/api/notification/",notification_route);
+app.use("/api/location/",location_route);
 
 const port = process.env.PORT || 80;
 
