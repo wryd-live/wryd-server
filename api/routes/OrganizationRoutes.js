@@ -117,7 +117,14 @@ Router.get("/delete/:id",(req,res)=>{
     mysqlConnection.query("DELETE FROM organization WHERE organization.id=?",[orgid],(err,rows,fields)=>{
         if(!err)
         {
-            res.send(rows);
+            if(rows["affectedRows"]!=0)
+            {
+                res.send(rows);
+            }
+            else
+            {
+                res.sendStatus(404);
+            }
         }
         else
         {
