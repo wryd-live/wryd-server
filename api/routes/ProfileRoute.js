@@ -315,6 +315,30 @@ Router.get("/request/accept/:personid/:userid",async (req,res)=>{
 
 })
 
+Router.get("/request/reject/:personid/:userid",async (req,res)=>{
+
+    const userid=req.params.userid;
+    const personid=req.params.personid;
+    const incoming = await incomingRequest(personid,userid);
+
+    if(incoming)
+    {
+        const removeIncoming = await removeIncomingRequest(personid,userid);
+        const removeOutgoing = await removeOutgoingRequest(userid,personid);
+        
+        if(removeIncoming && removeOutgoing)
+        {
+            res.sendStatus(200);
+        }
+        else{
+            res.sendStatus(404);
+        }
+    }
+    else
+    {
+        res.sendStatus(404);
+    }
+})
 
 Router.get("/unfriend/:personid/:userid",async (req,res)=>{
 
