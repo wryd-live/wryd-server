@@ -206,5 +206,57 @@ Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
     }
 })
 
+Router.get("/unfriend/:personid/:userid",async (req,res)=>{
+
+    const userid=req.params.userid;
+    const personid=req.params.personid;
+    const isFriend = await isPersonMyFriend(userid,personid);
+    const query_str = `DELETE FROM friends
+    WHERE first = ? AND second = ?`
+    if(isFriend)
+    {
+        mysqlConnection.query(query_str,[userid,personid],(err,rows,fields)=>{
+            if(!err)
+            {
+                if(rows["affectedRows"]!=0)
+                {
+                    const query_string = `DELETE FROM friends
+                    WHERE first = ? AND second = ?`
+                    mysqlConnection.query(query_string,[personid,userid],(err,rows,fields)=>{
+                        if(!err)
+                        {
+                            if(rows["affectedRows"]!=0)
+                            {
+                                res.sendStatus(200);
+                            }
+                            else
+                            {
+                                res.sendStatus(404);
+                            }
+                        }
+                        else
+                        {
+                            res.sendStatus(404);
+                        }
+                    })
+                }
+                else
+                {
+                    res.sendStatus(404);
+                }
+            }
+            else
+            {
+                console.log(err);
+                res.sendStatus(404);
+            }
+        })
+    }
+    else
+    {
+        res.sendStatus(404);
+    }
+})
+
 
 module.exports = Router;
