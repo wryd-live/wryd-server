@@ -80,6 +80,42 @@ function outgoingRequest(first, second)
 
     });
 }
+function removeOutgoingRequest(first, second)
+{
+    const query_str = `DELETE FROM request_outgoing
+        WHERE first = ? and second = ?`
+    return new Promise(resolve=>{
+        mysqlConnection.query(query_str,[first,second],(err,rows,fields)=>{
+            if(rows["affectedRows"]!=0)
+            {
+                resolve(true);
+            }
+            else
+            {
+                resolve(false);
+            }
+        })
+
+    });
+}
+function removeIncomingRequest(first, second)
+{
+    const query_string = `DELETE FROM request_incoming
+                    WHERE first = ? and second = ?`
+    return new Promise(resolve=>{
+        mysqlConnection.query(query_string,[first,second],(err,rows,fields)=>{
+            if(rows["affectedRows"]!=0)
+            {
+                resolve(true);
+            }
+            else
+            {
+                resolve(false);
+            }
+        })
+
+    });
+}
 
 Router.get("/view/:personid/:userid", async(req, res) => {
 
@@ -152,6 +188,62 @@ Router.get("/view/:personid/:userid", async(req, res) => {
     })
 })
 
+Router.get("/request/send/:personid/:userid",async (req,res)=>{
+
+    const userid=req.params.userid;
+    const personid=req.params.personid;
+    const isFriend = await isPersonMyFriend(userid,personid);
+    const incoming = await incomingRequest(userid,personid);
+    const outgoing = await outgoingRequest(userid,personid);
+
+    if(isFriend)
+    {
+        res.json(
+            {
+                msg: "Already Friend"
+            }    
+        );
+    }
+    else if(incoming || outgoing)
+    {
+        res.json(
+            {
+                msg: "Request Ongoing"
+            }    
+        );
+    }
+    else if(!isFriend && !(incoming && outgoing))
+    {
+        mysqlConnection.query("INSERT INTO request_outgoing(first,second) values (?,?)",[userid,personid],(err,rows,fields)=>{
+            if(err)
+            {
+                res.sendStatus(404);
+            }
+        })
+        mysqlConnection.query("INSERT INTO request_incoming(first,second) values (?,?)",[personid,userid],(err,rows,fields)=>{
+            if(err)
+            {
+                res.sendStatus(404);
+            }
+        })
+        const req_type = `requested`;
+        mysqlConnection.query("INSERT INTO notification(userid,type,personid) values (?,?,?)",[personid,req_type,userid],(err,rows,fields)=>{
+            if(!err)
+            {
+                res.sendStatus(200);
+            }
+            else
+            {
+                res.sendStatus(404);
+            }
+        })
+    }
+    else
+    {
+        res.sendStatus(404);
+    }
+})
+
 Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
 
     const userid=req.params.userid;
@@ -160,45 +252,16 @@ Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
 
     if(outgoing)
     {
-        const query_str = `DELETE FROM request_outgoing
-        WHERE first = ? and second = ?`
+        const removeIncoming = await removeIncomingRequest(personid,userid);
+        const removeOutgoing = await removeOutgoingRequest(userid,personid);
         
-        mysqlConnection.query(query_str,[userid,personid],async (err,rows,fields)=>{
-            if(!err)
-            {
-                if(rows["affectedRows"]!=0)
-                {
-                    const query_string = `DELETE FROM request_incoming
-                    WHERE first = ? and second = ?`
-
-                    mysqlConnection.query(query_string,[personid,userid],async (err,rows,fields)=>{
-                        if(!err)
-                        {
-                            if(rows["affectedRows"]!=0)
-                            {
-                                res.sendStatus(200);
-                            }
-                            else
-                            {
-                                res.sendStatus(404);
-                            }
-                        }
-                        else
-                        {
-                            res.sendStatus(404);
-                        }
-                    })
-                }
-                else
-                {
-                    res.sendStatus(404);
-                }
-            }
-            else
-            {
-                res.sendStatus(404);
-            }
-        })
+        if(removeIncoming && removeOutgoing)
+        {
+            res.sendStatus(200);
+        }
+        else{
+            res.sendStatus(404);
+        }
     }
     else
     {
