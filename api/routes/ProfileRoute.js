@@ -152,6 +152,59 @@ Router.get("/view/:personid/:userid", async(req, res) => {
     })
 })
 
+Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
+
+    const userid=req.params.userid;
+    const personid=req.params.personid;
+    const outgoing = await outgoingRequest(userid,personid);
+
+    if(outgoing)
+    {
+        const query_str = `DELETE FROM request_outgoing
+        WHERE first = ? and second = ?`
+        
+        mysqlConnection.query(query_str,[userid,personid],async (err,rows,fields)=>{
+            if(!err)
+            {
+                if(rows["affectedRows"]!=0)
+                {
+                    const query_string = `DELETE FROM request_incoming
+                    WHERE first = ? and second = ?`
+
+                    mysqlConnection.query(query_string,[personid,userid],async (err,rows,fields)=>{
+                        if(!err)
+                        {
+                            if(rows["affectedRows"]!=0)
+                            {
+                                res.sendStatus(200);
+                            }
+                            else
+                            {
+                                res.sendStatus(404);
+                            }
+                        }
+                        else
+                        {
+                            res.sendStatus(404);
+                        }
+                    })
+                }
+                else
+                {
+                    res.sendStatus(404);
+                }
+            }
+            else
+            {
+                res.sendStatus(404);
+            }
+        })
+    }
+    else
+    {
+        res.sendStatus(404);
+    }
+})
 
 
 module.exports = Router;
