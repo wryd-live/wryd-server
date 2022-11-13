@@ -23,11 +23,44 @@ function getOrgById(orgId)
     });
 }
 
-function getAllUsers(orgId)
+function getFriendsOfUser(userid)
 {
     return new Promise(resolve=>{
-        mysqlConnection.query("SELECT * FROM user",(err,rows,fields)=>{
+        const query_string = `SELECT friends.second as person_id,user.name as person_name,user.imageurl
+        FROM friends
+        INNER JOIN user
+        ON friends.second = user.id
+        where friends.first = ?`
+        
+        mysqlConnection.query(query_string,[userid],(err,rows,fields)=>{
             if(!err)
+            {
+                if(rows.length != 0)
+                {
+                    resolve([rows,null]);
+
+                }
+                else
+                {
+                    resolve([null,404]);
+                }
+            }
+            else
+            {
+                resolve([null,404]);
+            }
+        })
+    });
+}
+
+
+
+function getUsersByOrgId(orgId)
+{
+    return new Promise(resolve=>{
+
+        mysqlConnection.query("SELECT user.id, user.name,user.verified,user.imageurl FROM user WHERE user.organization=?",[orgId],(err,rows,fields)=>{
+            if(!err && rows.length!=0)
             {
                 resolve([rows,null]);
             }
@@ -47,27 +80,103 @@ Router.get("/all/:orgid",async (req,res)=>{
     let rowsOutput =  await getOrgById(orgid);
     if(rowsOutput[1])
     {
-        res.sendStatus(404);
+        res.sendStatus(404);    
+        return;
     }
-    else
+
+    let fS1 = await getUsersByOrgId(orgid);
+
+    if(fS1[1])
     {
+        res.sendStatus(404);
+        return;
+    }
+
+    let usersOutput = fS1[0];
+    
+    const userInOrg = new Set();
+
+    for(let i=0;i<usersOutput.length;i++)
+    {
+        userInOrg.add(usersOutput[i].id);
+    }
+    
+    console.log(usersOutput);
+
+    /* Takes a list of playlists, and an ID to remove */
+    const removeOutsiders = (userData) =>
+    userData.filter(userli => userInOrg.has(userli.id) && userli.verified==1);
+
+    /* Removes playlist ID 2 from list, prints result */
+    const userOutputFiltered = removeOutsiders(usersOutput);
+    const userOutputFilteredMap = new Map();
+
+    for(let i=0;i<userOutputFiltered.length;i++)
+    {
+        userOutputFilteredMap.set(userOutputFiltered[i].id,[userOutputFiltered[i].name,userOutputFiltered[i].imageurl]);
+    }
+
+    //Calling Wryd Live API
+    
+    try {
         let rows = rowsOutput[0];
         let orgUsername = rows[0]["username"];
-        let orgName = rows[0]["name"];
-        let orgDomain = rows[0]["domain"];
-
-        console.log(orgUsername);
-        console.log(orgName);
-        console.log(orgDomain);
-
+    
         let wrydURL = `https://wryd.live/api/v1/locations/${orgUsername}`;
-
-        console.log(wrydURL);
+    
         let wrydResponse = await axios.get(wrydURL);
-        // console.log(wrydResponse.data);
+    
+
+        let splicedUsers = [];
+        for(let i=0;i<wrydResponse.data["locations"].length;i++)
+        {
+            let deviceId = wrydResponse.data["locations"][i]["device"];
+            let deviceIdInt = parseInt(deviceId);
+            if(userOutputFilteredMap.has(deviceIdInt))
+            {
+                wrydResponse.data["locations"][i]["person_id"] = deviceId;
+                wrydResponse.data["locations"][i]["person_name"] = userOutputFilteredMap.get(deviceIdInt)[0];
+                wrydResponse.data["locations"][i]["person_imageurl"] = userOutputFilteredMap.get(deviceIdInt)[1];
+            }
+            else
+            {
+                splicedUsers.push(i);
+            }
+        }
+
+        for (var i = splicedUsers.length-1; i >= 0; i--)
+        {
+            wrydResponse.data["locations"].splice(splicedUsers[i],1);
+        }
+        
+        res.send(wrydResponse.data);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(404);
+    }
+
+})
+
+
+
+
+
+Router.get("/test",async (req,res)=>{
+
+
+    try {
+        let wrydURL = `https://wryd.live/api/v1/locations/demoiiit`;
+    
+        let wrydResponse = await axios.get(wrydURL);
+        
         res.send(wrydResponse.data);
     }
-})
+    catch(error)
+    {
+        console.log(error);
+        res.sendStatus(404);
+    }
+});
 
 
 module.exports=Router;
