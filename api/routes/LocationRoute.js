@@ -59,7 +59,7 @@ function getUsersByOrgId(orgId)
 {
     return new Promise(resolve=>{
 
-        mysqlConnection.query("SELECT user.id, user.name,user.verified,user.imageurl FROM user WHERE user.organization=?",[orgId],(err,rows,fields)=>{
+        mysqlConnection.query("SELECT user.id, user.name,user.verified,user.imageurl FROM user WHERE user.organization=? AND user.verified=?",[orgId,1],(err,rows,fields)=>{
             if(!err && rows.length!=0)
             {
                 resolve([rows,null]);
@@ -104,16 +104,12 @@ Router.get("/all/:orgid",async (req,res)=>{
     console.log(usersOutput);
 
     /* Takes a list of playlists, and an ID to remove */
-    const removeOutsiders = (userData) =>
-    userData.filter(userli => userInOrg.has(userli.id) && userli.verified==1);
 
-    /* Removes playlist ID 2 from list, prints result */
-    const userOutputFiltered = removeOutsiders(usersOutput);
     const userOutputFilteredMap = new Map();
 
-    for(let i=0;i<userOutputFiltered.length;i++)
+    for(let i=0;i<usersOutput.length;i++)
     {
-        userOutputFilteredMap.set(userOutputFiltered[i].id,[userOutputFiltered[i].name,userOutputFiltered[i].imageurl]);
+        userOutputFilteredMap.set(usersOutput[i].id,[usersOutput[i].name,usersOutput[i].imageurl]);
     }
 
     //Calling Wryd Live API
