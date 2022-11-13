@@ -23,6 +23,27 @@ function getOrgById(orgId)
     });
 }
 
+
+function getOrgByUserId(userid)
+{
+    return new Promise(resolve=>{
+
+        mysqlConnection.query("SELECT * FROM organization WHERE organization.id=(SELECT user.organization FROM user WHERE user.id = ?)",[userid],(err,rows,fields)=>{
+            if(!err && rows.length!=0)
+            {
+                // 0        1
+                //[rows , error]
+                resolve([rows,null]);
+            }
+            else
+            {
+                resolve([null,404]);
+            }
+        })
+    });
+}
+
+
 function getFriendsOfUser(userid)
 {
     return new Promise(resolve=>{
@@ -94,13 +115,6 @@ Router.get("/all/:orgid",async (req,res)=>{
 
     let usersOutput = fS1[0];
     
-    const userInOrg = new Set();
-
-    for(let i=0;i<usersOutput.length;i++)
-    {
-        userInOrg.add(usersOutput[i].id);
-    }
-    
     console.log(usersOutput);
 
     /* Takes a list of playlists, and an ID to remove */
@@ -152,6 +166,90 @@ Router.get("/all/:orgid",async (req,res)=>{
     }
 
 })
+
+
+
+
+Router.get("/friends/:userid",async (req,res)=>{
+    
+    const userid = req.params.userid;
+    
+    let rowsOutput =  await getOrgByUserId(userid);
+    if(rowsOutput[1])
+    {
+        res.sendStatus(404);    
+        return;
+    }
+
+
+    let fS1 = await getFriendsOfUser(userid);
+
+    if(fS1[1])
+    {
+        res.sendStatus(404);
+        return;
+    }
+
+    let usersOutput = fS1[0];
+    console.log("Friends");
+    console.log(usersOutput);
+
+    
+
+    const userOutputFilteredMap = new Map();
+
+    for(let i=0;i<usersOutput.length;i++)
+    {
+        userOutputFilteredMap.set(
+            usersOutput[i].person_id,
+            [
+                usersOutput[i].person_name,
+                usersOutput[i].imageurl
+            ]);
+    }
+
+    //Calling Wryd Live API
+    
+    try {
+        let rows = rowsOutput[0];
+        let orgUsername = rows[0]["username"];
+    
+        let wrydURL = `https://wryd.live/api/v1/locations/${orgUsername}`;
+    
+        let wrydResponse = await axios.get(wrydURL);
+    
+
+        let splicedUsers = [];
+        for(let i=0;i<wrydResponse.data["locations"].length;i++)
+        {
+            let deviceId = wrydResponse.data["locations"][i]["device"];
+            let deviceIdInt = parseInt(deviceId);
+            if(userOutputFilteredMap.has(deviceIdInt))
+            {
+                wrydResponse.data["locations"][i]["person_id"] = deviceId;
+                wrydResponse.data["locations"][i]["person_name"] = userOutputFilteredMap.get(deviceIdInt)[0];
+                wrydResponse.data["locations"][i]["person_imageurl"] = userOutputFilteredMap.get(deviceIdInt)[1];
+            }
+            else
+            {
+                splicedUsers.push(i);
+            }
+        }
+
+        for (var i = splicedUsers.length-1; i >= 0; i--)
+        {
+            wrydResponse.data["locations"].splice(splicedUsers[i],1);
+        }
+        
+        res.send(wrydResponse.data);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(404);
+    }
+
+})
+
+
 
 
 
