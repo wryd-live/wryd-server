@@ -232,4 +232,33 @@ Router.delete("/dp/:id",(req,res)=>{
 
 })
 
+Router.get("/verify/:userid/:verification_key",(req,res)=>{
+    const userid=req.params.userid;
+    const verificationKey=req.params.verification_key;
+    mysqlConnection.query("UPDATE user SET verified = 1 WHERE verification_key = ? AND id = ?",[verificationKey,userid],(err,rows,fields)=>{
+        if(err)
+        {
+            console.log(err);
+        }
+        else
+        {
+            if(rows.affectedRows==0)
+            {
+                res.send("Link Expired(already verified)/Invalid Key/Invalid User");
+                return;
+            }
+            mysqlConnection.query("UPDATE user SET verification_key=? WHERE id=?",[null,userid],(err,rows,fields)=>{
+                if(err)
+                {
+                    console.log(err);
+                }
+                else
+                {
+                    console.log("Verification key set to NULL");
+                    res.send("User Verified");
+                }
+            })
+        }
+    })
+})
 module.exports=Router;
