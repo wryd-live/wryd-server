@@ -273,7 +273,7 @@ Router.get("/request/accept/:personid/:userid",async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
-    const incoming = await incomingRequest(personid,userid);
+    const incoming = await incomingRequest(userid,personid);
 
     if(incoming)
     {
@@ -296,8 +296,8 @@ Router.get("/request/accept/:personid/:userid",async (req,res)=>{
                 res.sendStatus(404);
             }
         })
-        const removeIncoming = await removeIncomingRequest(personid,userid);
-        const removeOutgoing = await removeOutgoingRequest(userid,personid);
+        const removeIncoming = await removeIncomingRequest(userid,personid);
+        const removeOutgoing = await removeOutgoingRequest(personid,userid);
         
         if(removeIncoming && removeOutgoing)
         {
