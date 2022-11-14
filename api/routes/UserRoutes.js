@@ -173,9 +173,10 @@ Router.get("/all/delete/:id",(req,res)=>{
 })
 
 Router.post("/dp/:id",(req,res)=>{
+    const userid=req.params.id;
     const postData=req.body;
-    const {userid,imageurl}=postData;
-    if(userid==null || imageurl==null)
+    const {imageurl}=postData;
+    if(imageurl==null)
     {
         res.send("Invalid input");
         return;
