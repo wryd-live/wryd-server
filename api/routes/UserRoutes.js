@@ -92,7 +92,8 @@ Router.post('/create', async(req, res) => {
             else
             {
                 //user inserted
-                // var ans = sendEmailVerificationLink(name,email,verificationKey,req);
+                const userid=rows.insertId;
+                var ans = sendEmailVerificationLink(userid,name,email,verificationKey,req);
                 var ans = true;
                 
                 res.json({
@@ -170,5 +171,31 @@ Router.get("/all/delete/:id",(req,res)=>{
         }
     }) 
 })
+
+Router.post("/dp/:id",(req,res)=>{
+    const postData=req.body;
+    const {userid,imageurl}=postData;
+    if(userid==null || imageurl==null)
+    {
+        res.send("Invalid input");
+        return;
+    }
+    mysqlConnection.query("UPDATE user SET imageurl=? WHERE id=?",[imageurl,userid],(err,rows,fields)=>{
+        if(err)
+        {
+            console.log(err);
+        }
+        else
+        {
+            if(rows.affectedRows==0)
+            {
+                res.send("Invalid User");
+                return;
+            }
+            res.send("Image Updated Successfully");
+        }
+    })
+})
+
 
 module.exports=Router;
