@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const { getAPIHostURL } = require('../config');
+const { getAPIHostURL } = require('./config');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -12,14 +12,16 @@ const transporter = nodemailer.createTransport({
 let mailOptions = {
   from: 'LinkStack <projectlinkedlist@gmail.com>',
   to: 'siddhant.dixit23@gmail.com',
-  subject: 'Account Verification',
+  subject: 'WRYD Account Verification',
 };
 
 
 module.exports.sendEmailVerificationLink = function(username,email,verificationToken,request,callback)
 {
-    let bodycontent = `Hi ${username}, Please verify your LinkedList Account <br> <br>`;
-    bodycontent+=`Verification URL <br> ${getAPIHostURL(request)}/verify?token=${verificationToken}`;
+    //  /api/user/verify/:userid/:verification_key
+
+    let bodycontent = `Hi ${username}, Please verify your WRYD Account <br> <br>`;
+    bodycontent+=`Verification URL <br> ${getAPIHostURL(request)}/api/user/verify/${username}?token=${verificationToken}`;
 
     mailOptions.to = email;
     mailOptions.html = bodycontent;
