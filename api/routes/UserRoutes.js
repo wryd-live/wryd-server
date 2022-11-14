@@ -198,5 +198,38 @@ Router.post("/dp/:id",(req,res)=>{
     })
 })
 
+Router.delete("/dp/:id",(req,res)=>{
+    const userid=req.params.id;
+    mysqlConnection.query("SELECT name FROM user WHERE id=?",[userid],(err,rows1,fields)=>{
+        if(err)
+        {
+            console.log(err);
+        }
+        else
+        {
+            // console.log(rows);
+            if(rows1.length==0)
+            {
+                res.send("User doesnt exist");
+                return;
+            }
+            else
+            {
+                const name=rows1[0]["name"];
+                const imageurl=`https://api.multiavatar.com/${name}`;
+                mysqlConnection.query("UPDATE user SET imageurl=? WHERE id=?",[imageurl,userid],(err,rows,fields)=>{
+                    if(err){
+                        console.log(err);
+                    }
+                    else
+                    {
+                        res.send("Profile Pic Deleted Successfully");
+                    }
+                })
+            }
+        }
+    })
+
+})
 
 module.exports=Router;
