@@ -1,6 +1,7 @@
 const express = require("express");
 const Router=express.Router();
 const mysqlConnection=require("../utils/connection");
+const {sendEmailVerificationLink} = require('../utils/emailController');
 var validator=require('validator');
 const crypto=require("crypto");
 
@@ -93,13 +94,20 @@ Router.post('/create', async(req, res) => {
             {
                 //user inserted
                 const userid=rows.insertId;
-                var ans = sendEmailVerificationLink(userid,name,email,verificationKey,req);
-                var ans = true;
-                
-                res.json({
-                    code:200,
-                    msg: "User Created Successfully"
-                })
+                // var ans = sendEmailVerificationLink(userid,name,email,verificationKey,req);
+
+                sendEmailVerificationLink(userid,name,email,verificationKey,req, (response) => {
+                    console.log("==== app.js ======");
+                    console.log(response);
+                    if (response == 200) {
+                      // res.send("Verification Email Successfully Sent!");
+                      res.json({code:'2010',msg:"Signup Successfull & Verification Email Successfully Sent!"});
+                    } else {
+                      // Account Created Successfully But Failed to Send Verification Email
+                      res.status(404);
+                      res.json({code:'011',msg:"Signup Successfull but failed to send verification email"});
+                    }
+                  });
             }
         });
     }
