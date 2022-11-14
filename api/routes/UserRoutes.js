@@ -4,10 +4,19 @@ const mysqlConnection=require("../utils/connection");
 var validator=require('validator');
 const crypto=require("crypto");
 
+const {sendEmailVerificationLink,sendForgotLink} = require('../utils/emailController');
+
+
 function CreateVerificationKey()
 {
     const verificationKey=crypto.randomBytes(64).toString('hex');
     return verificationKey;
+}
+
+function CreateForgetKey()
+{
+    const forgetKey=crypto.randomBytes(64).toString('hex');
+    return forgetKey;
 }
 
 function CheckEmailDomain(email,organization_id)
@@ -34,16 +43,33 @@ function CheckEmailDomain(email,organization_id)
     });
 }
 
-function checkEmailExists(email){
-    return new Promise((myResolve,myReject)=>{
-        let emailExists;
-        mysqlConnection.query("select * from user where email = ?",[email],(err,row,fields)=>{
+function checkIfUserExists(userid){
+    return myPromise = new Promise(myResolve=>{
+        mysqlConnection.query("Select Userid from forgot where userid = ?",[userid],(err,rows,fields)=>{
             if(!err){
-                myResolve({data:rows})
+                if(rows.length) myResolve(true);
+                else myResolve(false);
+            }
+            else{myResolve(false)}
+        })
+    })
+}
+
+function getUserDetails(email){
+    return new Promise((myResolve,myReject)=>{
+        let user;
+        mysqlConnection.query("select * from user where email = ?",[email],(err,rows,fields)=>{
+            if(!err){
+                if(rows.length){
+                    user = rows[0];
+                    myResolve({status:200,message:"user exists in database",user:user})
+                }
+                else{
+                    myResolve({status:404,message:"user doesn't exist in database",user:{}})
+                }
             }
             else{
-                console.log(err)
-                myReject({status:500,msg:"something went wrong"})
+                myReject({status:500,msg:"something went wrong",user:{}})
             }
         })
     })
@@ -107,7 +133,6 @@ Router.post('/create', async(req, res) => {
             }
             else
             {
-                //user inserted
                 const userid=rows.insertId;
                 var ans = sendEmailVerificationLink(userid,name,email,verificationKey,req);
                 var ans = true;
@@ -248,11 +273,66 @@ Router.delete("/dp/:id",(req,res)=>{
 
 })
 
-Router.get("/forget/:email",(req,res) => {
-    const email = req.params.email;
-    const user = checkEmailExists(email)
-    res.json(user)
+Router.get("/forget/:email",async(req,res) => {
+    //email is sent here which user click and request is sent to another route
+    try{
+        const email = req.params.email;
+        const verify = await getUserDetails(email);
+        if(verify.status!=200){
+            res.json({status:verify.status,message:verify.message,user:verify.user})
+            return
+        }
+        const {user} = verify;
+        const forgetKey = CreateForgetKey();
+        const date = new Date();
+        const time = date.getTime();
+        let query;
 
+        if(checkIfUserExists(user.id)){
+            query = `update forgot set forgetkey = ?,time = ? where userid = ?`
+        }
+        else{
+            query = `INSERT INTO forgot (forgetkey,time,userid) VALUES (?,?,?)`
+        }
+
+        mysqlConnection.query(query,[forgetKey,time,user.id],(err,rows,fields)=>{
+            if(err)
+            {
+                const myerr = err.errno;
+                res.status(400);
+                if(myerr==1062)
+                {
+                    res.json(
+                        {
+                            code: 400,
+                            msg: "Dupliacte entry"
+                        }
+                    );
+                }
+                else
+                {
+                    res.json(
+                        {
+                            code: 2003,
+                            msg: "Other Error"
+                        }
+                    );
+                }
+            }
+            else
+            {
+                const mail = sendForgotLink(user.name,user.email,forgetKey,req)
+                res.json({
+                    code:200,
+                    msg: "Mail sent successfully"
+                })
+            }
+        });
+    }
+    catch(err){
+        res.json({status:err.status,message:err.message})
+    }
+    
 })
 
 module.exports=Router;

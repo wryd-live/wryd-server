@@ -35,3 +35,23 @@ module.exports.sendEmailVerificationLink = function(username,email,verificationT
       }
     }); 
 }
+
+module.exports.sendForgotLink = function(username,email,forgetKey,request,callback)
+{
+
+    let bodycontent = `Hi ${username}, Your forgot password reset link for WRYD Account <br> <br>`;
+    bodycontent+=`Password Reset URL <br> ${getAPIHostURL(request)}/api/user/forget/${username}?key=${forgetKey}`;
+
+    mailOptions.to = email;
+    mailOptions.html = bodycontent;
+    
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        callback(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        callback(200);
+      }
+    }); 
+}
