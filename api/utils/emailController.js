@@ -18,7 +18,6 @@ let mailOptions = {
 
 module.exports.sendEmailVerificationLink = function(username,email,verificationToken,request,callback)
 {
-    //  /api/user/verify/:userid/:verification_key
 
     let bodycontent = `Hi ${username}, Please verify your WRYD Account <br> <br>`;
     bodycontent+=`Verification URL <br> ${getAPIHostURL(request)}/api/user/verify/${username}?token=${verificationToken}`;

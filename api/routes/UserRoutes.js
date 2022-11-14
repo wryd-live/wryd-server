@@ -34,6 +34,22 @@ function CheckEmailDomain(email,organization_id)
     });
 }
 
+function checkEmailExists(email){
+    return new Promise((myResolve,myReject)=>{
+        let emailExists;
+        mysqlConnection.query("select * from user where email = ?",[email],(err,row,fields)=>{
+            if(!err){
+                myResolve({data:rows})
+            }
+            else{
+                console.log(err)
+                myReject({status:500,msg:"something went wrong"})
+            }
+        })
+    })
+}
+
+
 Router.post('/create', async(req, res) => {
     var postData=req.body;
     const {name,email,password,organization_id}=postData;
@@ -229,6 +245,13 @@ Router.delete("/dp/:id",(req,res)=>{
             }
         }
     })
+
+})
+
+Router.get("/forget/:email",(req,res) => {
+    const email = req.params.email;
+    const user = checkEmailExists(email)
+    res.json(user)
 
 })
 
