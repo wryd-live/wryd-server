@@ -4,6 +4,7 @@ const mysqlConnection=require("../utils/connection");
 const {sendEmailVerificationLink} = require('../utils/emailController');
 var validator=require('validator');
 const crypto=require("crypto");
+const {requireAuth} = require("../middleware/authMiddleware");
 
 function CreateVerificationKey()
 {
@@ -142,9 +143,9 @@ Router.get("/all/:orgid",(req,res)=>{
     })
 })
 
-Router.get("/view/:id",(req,res)=>{
+Router.get("/view",requireAuth,(req,res)=>{
 
-    const userid=req.params.id;
+    const userid=req.params.userid;
 
     mysqlConnection.query("SELECT user.id, user.name,user.organization,user.verified,user.imageurl FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
         if(!err)
@@ -158,9 +159,9 @@ Router.get("/view/:id",(req,res)=>{
     })
 })
 
-Router.get("/delete/:id",(req,res)=>{
+Router.get("/delete",requireAuth,(req,res)=>{
 
-    const userid=req.params.id;
+    const userid=req.params.userid;
     mysqlConnection.query("DELETE FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
         if(!err)
         {
@@ -180,8 +181,8 @@ Router.get("/delete/:id",(req,res)=>{
     }) 
 })
 
-Router.post("/dp/:id",(req,res)=>{
-    const userid=req.params.id;
+Router.post("/dp",requireAuth,(req,res)=>{
+    const userid=req.params.userid;
     const postData=req.body;
     const {imageurl}=postData;
     if(imageurl==null)
@@ -206,8 +207,8 @@ Router.post("/dp/:id",(req,res)=>{
     })
 })
 
-Router.delete("/dp/:id",(req,res)=>{
-    const userid=req.params.id;
+Router.delete("/dp",requireAuth,(req,res)=>{
+    const userid=req.params.userid;
     mysqlConnection.query("SELECT name FROM user WHERE id=?",[userid],(err,rows1,fields)=>{
         if(err)
         {

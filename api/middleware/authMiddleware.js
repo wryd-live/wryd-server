@@ -14,7 +14,7 @@ const requireAuth = (req, res, next) => {
         if (err) {
           res.sendStatus(403);
         } else {
-          req.params.id = decodedToken.id;
+          req.params.userid = decodedToken.id;
           next();
         }
       });
