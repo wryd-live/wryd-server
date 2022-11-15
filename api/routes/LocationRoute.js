@@ -2,6 +2,7 @@ const axios = require('axios');
 const express=require("express");
 const Router=express.Router();
 const mysqlConnection=require("../utils/connection");
+const { requireAuth } = require('../middleware/authMiddleware');
 
 
 function getOrgById(orgId)
@@ -170,7 +171,7 @@ Router.get("/all/:orgid",async (req,res)=>{
 
 
 
-Router.get("/friends/:userid",async (req,res)=>{
+Router.get("/friends", requireAuth ,async (req,res)=>{
     
     const userid = req.params.userid;
     

@@ -19,7 +19,7 @@ const requireAuth = (req, res, next) => {
         }
       });
     } else {
-      res.redirect('/login');
+      res.sendStatus(404);
     }
   }
   catch(err)

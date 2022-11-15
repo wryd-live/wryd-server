@@ -1,8 +1,10 @@
 const express = require("express");
 const Router = express.Router();
 const mysqlConnection = require("../utils/connection");
+const {requireAuth} = require("../middleware/authMiddleware");
 
-Router.get("/:userid",(req,res)=>{
+
+Router.get("/", requireAuth, (req,res)=>{
 
     const userid = req.params.userid;
     const query_string = `SELECT notification.notificationid,notification.type,notification.personid,notification.time,user.name as person_name,user.imageurl
@@ -32,7 +34,7 @@ Router.get("/:userid",(req,res)=>{
     })
 })
 
-Router.get("/dismiss/:notificationid/:userid",(req,res)=>{
+Router.get("/dismiss/:notificationid",requireAuth, (req,res)=>{
 
     const notifyid = req.params.notificationid;
     const userid = req.params.userid;
