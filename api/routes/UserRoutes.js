@@ -142,7 +142,7 @@ Router.get("/all/:orgid",(req,res)=>{
     })
 })
 
-Router.get("/all/view/:id",(req,res)=>{
+Router.get("/view/:id",(req,res)=>{
 
     const userid=req.params.id;
 
@@ -158,7 +158,7 @@ Router.get("/all/view/:id",(req,res)=>{
     })
 })
 
-Router.get("/all/delete/:id",(req,res)=>{
+Router.get("/delete/:id",(req,res)=>{
 
     const userid=req.params.id;
     mysqlConnection.query("DELETE FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
