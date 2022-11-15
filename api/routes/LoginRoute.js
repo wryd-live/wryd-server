@@ -67,7 +67,7 @@ Router.post("/", async (req, res) => {
     const result = await searchUser(email,password);
     if(result[1])
     {
-        res.sendStatus(404);
+        res.status(404);
         res.json({
             code: 1002,
             msg: "email or password is incorrect"
