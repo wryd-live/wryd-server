@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="stylesheet" href="/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+  <title>Wyrd-reset password</title>
+</head>
+<body>
+  <div class="container" style="margin-top: 40px;">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="horizontal-container">
+          <div class="progress-bar-container">
+          <div class="horizontal-form-box">
+            <div class="horizontal-info-container text-center">
+              <img src="https://static.stayjapan.com/assets/top/icon/values-7dd5c8966d7a6bf57dc4bcd11b2156e82a4fd0da94a26aecb560b6949efad2be.svg" />
+              <p class="horizontal-heading">Reset your password</p>
+              <p class="horizontal-subtitle">Your password needs to be at least 8 characters.</p>
+            </div>
+            <form class="horizontal-form" method="post" action="/api/user/forgetify/<%=userid%>/<%=forgetKey%>">
+              <div class="o3-form-group d-flex flex-column mb-4 mx-3">
+                <label for="new_password">New password</label>
+                <input type="password" name="password" class="o3-form-control o3-input-lg mt-2" id="new_password">
+              </div>
+              <div class="o3-form-group d-flex flex-column mb-4 mx-3">
+                <label for="confirm_password">Confirm new password</label>
+                <input type="password" name="confirmPassword" class="o3-form-control o3-input-lg mt-2" id="confirm_password">
+              </div>
+              <button class="o3-btn o3-btn-primary o3-btn-block" type="submit">Set new password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</body>
+</html>

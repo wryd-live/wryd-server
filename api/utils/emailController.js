@@ -36,11 +36,11 @@ module.exports.sendEmailVerificationLink = function(username,email,verificationT
     }); 
 }
 
-module.exports.sendForgotLink = function(username,email,forgetKey,request,callback)
+module.exports.sendForgotLink = function(username,userid,email,forgetKey,request,callback)
 {
 
     let bodycontent = `Hi ${username}, Your forgot password reset link for WRYD Account <br> <br>`;
-    bodycontent+=`Password Reset URL <br> ${getAPIHostURL(request)}/api/user/forget/${username}?key=${forgetKey}`;
+    bodycontent+=`Password Reset URL <br> ${getAPIHostURL(request)}/api/user/forgetify/${userid}/${forgetKey}`;
 
     mailOptions.to = email;
     mailOptions.html = bodycontent;

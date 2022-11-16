@@ -1,0 +1,40 @@
+.horizontal-container {
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .horizontal-container {
+    width: 500px;
+  }
+}
+
+.horizontal-container .horizontal-form-box {
+    background-color: #fff;
+    border: 1px solid #e5e5e5;
+    height: 466px;
+    padding: 30px;
+  }
+  .horizontal-container .horizontal-form-box .horizontal-info-container img {
+    height: 75px;
+    margin-bottom: 20px;
+  }
+  .horizontal-container .horizontal-form-box .horizontal-info-container .horizontal-heading {
+    color: #000;
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+  .horizontal-container .horizontal-form-box .horizontal-info-container .horizontal-subtitle {
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .horizontal-container .horizontal-form-box .horizontal-form label,
+  .horizontal-container .horizontal-form-box .horizontal-form button {
+    text-transform: capitalize;
+  }
+  .horizontal-container .horizontal-form-box .horizontal-form label {
+    color: #000;
+    font-weight: normal;
+  }

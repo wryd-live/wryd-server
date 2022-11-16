@@ -13,8 +13,10 @@ const organization_routes =require("./routes/OrganizationRoutes");
 const app = express()
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}))
 app.set('json spaces', 2);
 app.use(morgan('tiny'))
+app.use(express.static('public'))
 
 
 

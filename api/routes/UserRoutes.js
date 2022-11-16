@@ -55,6 +55,26 @@ function checkIfUserExists(userid){
     })
 }
 
+function updatePassword(userid,password){
+    console.log(userid,password)
+    return myPromise = new Promise((myResolve,myReject)=>{
+        mysqlConnection.query("update user set password = ? where id = ?",[password,userid],(err,result)=>{
+            if(!err){
+                if(result.affectedRows){
+                    myResolve({status:200,message:"password changed successfullt"})
+                }
+                else{
+                    myResolve({status:404,message:err.sqlMessage,user:{}})
+                }
+            }
+            else{
+                console.log(err)
+                myReject({status:500,msg:"something went wrong",user:{}})
+            }
+        })
+    })
+}
+
 function getUserDetails(email){
     return new Promise((myResolve,myReject)=>{
         let user;
@@ -288,17 +308,18 @@ Router.get("/forget/:email",async(req,res) => {
         const time = date.getTime();
         let query;
 
-        if(checkIfUserExists(user.id)){
+        if(await checkIfUserExists(user.id)){
             query = `update forgot set forgetkey = ?,time = ? where userid = ?`
         }
         else{
             query = `INSERT INTO forgot (forgetkey,time,userid) VALUES (?,?,?)`
         }
 
-        mysqlConnection.query(query,[forgetKey,time,user.id],(err,rows,fields)=>{
+        mysqlConnection.query(query,[forgetKey,time,user.id],(err,result)=>{
             if(err)
             {
                 const myerr = err.errno;
+                console.log(myerr)
                 res.status(400);
                 if(myerr==1062)
                 {
@@ -321,7 +342,7 @@ Router.get("/forget/:email",async(req,res) => {
             }
             else
             {
-                const mail = sendForgotLink(user.name,user.email,forgetKey,req)
+                const mail = sendForgotLink(user.name,user.id,user.email,forgetKey,req)
                 res.json({
                     code:200,
                     msg: "Mail sent successfully"
@@ -334,5 +355,74 @@ Router.get("/forget/:email",async(req,res) => {
     }
     
 })
+
+Router.get("/forgetify/:userid/:forgetKey",async(req,res)=>{
+    try{
+        const userid = req.params.userid;
+        const forgetKey = req.params.forgetKey;
+        const query = "SELECT userid,forgetkey FROM forgot where userid = ?"
+        mysqlConnection.query(query,[userid],(err,rows,fields)=>{
+            if(err)
+            {
+                const myerr = err.errno;
+                console.log(err)
+                res.status(400);
+                
+                    res.json(
+                        {
+                            code: 2003,
+                            msg: "Other Error"
+                        }
+                    );
+            }
+            else
+            {
+                console.log(rows)
+                const mainUserid = rows.length&&rows[0].userid;
+                const mainForgetKey = rows.length&&rows[0].forgetkey;
+                console.log(userid,forgetKey,"\n")
+                console.log(mainUserid,mainForgetKey,"\n")
+                if(mainUserid==userid&&mainForgetKey==forgetKey){
+                    // res.json({
+                    //     code:200,
+                    //     msg: "Mail sent successfully"
+                    // })
+                    res.render('reset.ejs',{userid,forgetKey})    
+                }
+                else{
+                    res.json({
+                        code:404,
+                        msg:"userid or forgot key is invalid"
+                    })
+                }
+            }
+        });
+         
+    }
+    catch(err){
+        console.log(err)
+    }
+})
+
+Router.post("/forgetify/:userid/:forgetKey",async(req,res)=>{
+    try{
+        const userid = req.params.userid;
+        console.log(await req.body)
+        const forgetKey = req.params.forgetKey;
+        const password = req.body.password;
+        console.log(password)
+        const confirmPassword = req.body.confirmPassword;
+        if(password!=confirmPassword){res.render('/reset',{msg:"password doesn't match",userid:userid,forgetKey:forgetKey})}
+        else{
+            const result = await updatePassword(userid,password);
+            res.json({code:result.code,msg:result.msg});
+        }
+    }
+    catch(err){
+        console.log(err)
+        res.json({err})
+    }
+})
+
 
 module.exports=Router;
