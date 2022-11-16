@@ -105,7 +105,7 @@ Router.get("/view/:id",async (req,res)=>{
     }
     else
     {
-        res.send(rowsOutput[0]);
+        res.send(rowsOutput[0][0]);
     }
 })
 
