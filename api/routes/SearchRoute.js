@@ -1,8 +1,10 @@
 const express = require("express");
 const Router = express.Router();
 const mysqlConnection = require("../utils/connection");
+const {requireAuth} = require("../middleware/authMiddleware");
 
-Router.get("/:name/:userid", (req, res) => {
+
+Router.get("/:name",requireAuth, (req, res) => {
 
     const myname = req.params.name;
     const searchedExpression = `%${myname.trim()}%`;

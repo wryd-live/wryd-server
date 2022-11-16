@@ -11,6 +11,7 @@ const search_route = require("./routes/SearchRoute");
 const notification_route = require("./routes/NotificationRoute");
 const profile_route = require("./routes/ProfileRoute");
 const location_route = require("./routes/LocationRoute")
+const login_route = require("./routes/LoginRoute")
 
 
 
@@ -28,6 +29,7 @@ app.use("/api/search/",search_route);
 app.use("/api/notification/",notification_route);
 app.use("/api/profile/",profile_route);
 app.use("/api/location/",location_route);
+app.use("/api/login/",login_route);
 
 const port = process.env.PORT || 80;
 
@@ -36,7 +38,7 @@ const port = process.env.PORT || 80;
 
 
 app.get('/',(req,res)=>{
-    res.send("Welcome to WRYD Server");
+    res.send("Welcome to WRYD API Server");
 });
 
 

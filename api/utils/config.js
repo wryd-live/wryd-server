@@ -6,7 +6,7 @@ require('crypto').randomBytes(64).toString('hex')
 
 // Login Configs
 
-const LOGIN_MAXAGE = 5 * (24 * 60 * 60) // 5 days
+const LOGIN_MAXAGE = 30 * (24 * 60 * 60) // 5 days
 
 
 // Email Verification Configs

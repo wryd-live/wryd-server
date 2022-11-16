@@ -2,9 +2,10 @@ const e = require("express");
 const express = require("express");
 const Router = express.Router();
 const mysqlConnection = require("../utils/connection");
+const {requireAuth} = require("../middleware/authMiddleware");
 
 
-Router.get("/friends/:userid",async (req,res)=>{
+Router.get("/friends",requireAuth,async (req,res)=>{
 
     const userid=req.params.userid;
     const query_string = `SELECT friends.second as person_id,user.name as person_name,user.imageurl,user.email as person_email,friends.time
@@ -117,7 +118,7 @@ function removeIncomingRequest(first, second)
     });
 }
 
-Router.get("/view/:personid/:userid", async(req, res) => {
+Router.get("/view/:personid",requireAuth, async(req, res) => {
 
     const userid = req.params.userid;
     const personid = req.params.personid;
@@ -188,7 +189,7 @@ Router.get("/view/:personid/:userid", async(req, res) => {
     })
 })
 
-Router.get("/request/send/:personid/:userid",async (req,res)=>{
+Router.get("/request/send/:personid",requireAuth, async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
@@ -244,7 +245,7 @@ Router.get("/request/send/:personid/:userid",async (req,res)=>{
     }
 })
 
-Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
+Router.get("/request/cancel/:personid",requireAuth ,async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
@@ -269,7 +270,7 @@ Router.get("/request/cancel/:personid/:userid",async (req,res)=>{
     }
 })
 
-Router.get("/request/accept/:personid/:userid",async (req,res)=>{
+Router.get("/request/accept/:personid",requireAuth ,async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
@@ -315,7 +316,7 @@ Router.get("/request/accept/:personid/:userid",async (req,res)=>{
 
 })
 
-Router.get("/request/reject/:personid/:userid",async (req,res)=>{
+Router.get("/request/reject/:personid",requireAuth,async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
@@ -340,7 +341,7 @@ Router.get("/request/reject/:personid/:userid",async (req,res)=>{
     }
 })
 
-Router.get("/unfriend/:personid/:userid",async (req,res)=>{
+Router.get("/unfriend/:personid",requireAuth,async (req,res)=>{
 
     const userid=req.params.userid;
     const personid=req.params.personid;
