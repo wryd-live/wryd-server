@@ -263,7 +263,7 @@ Router.get("/verify/:userid/:verification_key",(req,res)=>{
                 else
                 {
                     console.log("Verification key set to NULL");
-                    res.send("User Verified");
+                    res.sendFile('utils/userVerified.html');
                 }
             })
         }
