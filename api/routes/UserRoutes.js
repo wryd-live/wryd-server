@@ -36,6 +36,11 @@ function CheckEmailDomain(email,organization_id)
     });
 }
 
+Router.get('/checktoken',requireAuth,async(req,res)=>{
+    res.status(200).json({message:"Token is valid"});
+})
+
+
 Router.post('/create', async(req, res) => {
     var postData=req.body;
     const {name,email,password,organization_id}=postData;
