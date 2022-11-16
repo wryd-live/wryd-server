@@ -90,7 +90,8 @@ Router.post("/", async (req, res) => {
 
     const MYtoken = createLoginToken(userDetails.id);
     res.json({
-        id: userDetails.id,
+        userid: userDetails.id,
+        orgid: userDetails.organization,
         token: MYtoken,
     })
 
