@@ -11,6 +11,11 @@ function CreateVerificationKey()
     return verificationKey;
 }
 
+function validatePassword(password)
+{
+    return validator.isStrongPassword(password);
+}
+
 function CheckEmailDomain(email,organization_id)
 {
     return myPromise = new Promise(myResolve => {
@@ -40,7 +45,7 @@ Router.post('/create', async(req, res) => {
     const {name,email,password,organization_id}=postData;
     
     
-    if(name=="" || email=="" || password=="" || name == null || email==null || password==null)
+    if(name=="" || email=="" || password=="" || organization_id=="" ||name == null || email==null || password==null || organization_id==null)
     {
         res.status(404);
         res.json({
@@ -49,7 +54,12 @@ Router.post('/create', async(req, res) => {
         })
         return;
     }
-
+    
+    if(!validatePassword(password))
+    {
+        res.send("Password must be satisfy all the below conditions:\n1.Minimum length should be 8\n2.It should contain atleast 1 lowercase letter\n3.It should contain atleast 1 uppercase letter\n4.It should contain atleast 1 number\n5.It should contain atleast 1 symbol");
+        return;
+    }
     const isDomainValid= await CheckEmailDomain(email,organization_id);
     let verificationKey;
     if(!isDomainValid)
