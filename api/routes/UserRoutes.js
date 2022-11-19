@@ -162,7 +162,7 @@ Router.get("/view",requireAuth,(req,res)=>{
 
     const userid=req.params.userid;
 
-    mysqlConnection.query("SELECT user.id, user.name,user.organization,user.verified,user.imageurl FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
+    mysqlConnection.query("SELECT user.id,user.name AS UserName,user.organization,user.verified,user.imageurl,user.email,organization.name AS OrganizationName FROM user INNER JOIN organization ON user.organization=organization.id AND user.id=?",[userid],(err,rows,fields)=>{
         if(!err)
         {
             res.send(rows);
