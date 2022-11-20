@@ -63,7 +63,8 @@ Router.post('/create', async(req, res) => {
     
     if(!validatePassword(password))
     {
-        res.send("Password must be satisfy all the below conditions:\n1.Minimum length should be 8\n2.It should contain atleast 1 lowercase letter\n3.It should contain atleast 1 uppercase letter\n4.It should contain atleast 1 number\n5.It should contain atleast 1 symbol");
+        res.status(404);
+        res.json({code:2001,msg:"Password must be satisfy all the below conditions:\n1.Minimum length should be 8\n2.It should contain atleast 1 lowercase letter\n3.It should contain atleast 1 uppercase letter\n4.It should contain atleast 1 number\n5.It should contain atleast 1 symbol"});
         return;
     }
     const isDomainValid= await CheckEmailDomain(email,organization_id);
@@ -117,11 +118,11 @@ Router.post('/create', async(req, res) => {
                     console.log(response);
                     if (response == 200) {
                       // res.send("Verification Email Successfully Sent!");
-                      res.json({code:'2010',msg:"Signup Successfull & Verification Email Successfully Sent!"});
+                      res.json({code:'2010',msg:"Signup Successfull & Verification Email Successfully Sent!",userid:userid});
                     } else {
                       // Account Created Successfully But Failed to Send Verification Email
                       res.status(404);
-                      res.json({code:'011',msg:"Signup Successfull but failed to send verification email"});
+                      res.json({code:'011',msg:"Signup Successfull but failed to send verification email",userid:userid});
                     }
                   });
             }
