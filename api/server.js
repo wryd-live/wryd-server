@@ -1,6 +1,8 @@
 const express = require("express")
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
+const ejs = require('ejs')
+const path = require('path');
 
 const mysqlConnection=require("./utils/connection");
 require('dotenv').config();
@@ -21,6 +23,8 @@ app.use(bodyParser.json());
 app.set('json spaces', 2);
 
 app.use(morgan('dev'))
+app.set('view engine', 'ejs');
+app.set('views',path.join(__dirname,'/../views'));
 
 
 app.use("/api/user",user_routes);
@@ -57,6 +61,12 @@ app.get('/api/city',(req,res)=>{
     });
 });
 */
+
+app.get('/template/verification',(req,res)=>{
+    res.render('userVerified',{
+        name: "Yuvraj"
+    });
+});
 
 
 app.get("*",(req,res)=>{

@@ -256,10 +256,27 @@ Router.delete("/dp",requireAuth,(req,res)=>{
 
 })
 
-Router.get("/verify/:userid/:verification_key",(req,res)=>{
+function getUsername(userid)
+{
+    return new Promise(resolve=>{
+        mysqlConnection.query("SELECT name FROM user WHERE user.id=?",[userid],(err,rows,fields)=>{
+
+            if(!err && rows.length!=0)
+            {
+                resolve([rows,null]);
+            }
+            else
+            {
+                resolve([null,404]);
+            }
+        })
+    });
+}
+
+Router.get("/verify/:userid/:verification_key",async(req,res)=>{
     const userid=req.params.userid;
     const verificationKey=req.params.verification_key;
-    mysqlConnection.query("UPDATE user SET verified = 1 WHERE verification_key = ? AND id = ?",[verificationKey,userid],(err,rows,fields)=>{
+    mysqlConnection.query("UPDATE user SET verified = 1 WHERE verification_key = ? AND id = ?",[verificationKey,userid],async (err,rows,fields)=>{
         if(err)
         {
             console.log(err);
@@ -271,15 +288,23 @@ Router.get("/verify/:userid/:verification_key",(req,res)=>{
                 res.send("Link Expired(already verified)/Invalid Key/Invalid User");
                 return;
             }
-            mysqlConnection.query("UPDATE user SET verification_key=? WHERE id=?",[null,userid],(err,rows,fields)=>{
+            mysqlConnection.query("UPDATE user SET verification_key=? WHERE id=?",[null,userid],async(err,rows,fields)=>{
                 if(err)
                 {
                     console.log(err);
                 }
                 else
                 {
+                    let rowsOutput = await getUsername(userid);
+                    console.log(rowsOutput[0][0].name);
+                    if(rowsOutput[1])
+                    {
+                        res.sendStatus(404);
+                    }
                     console.log("Verification key set to NULL");
-                    res.send("User Verified");
+                    res.render('userVerified',{
+                        name: rowsOutput[0][0].name
+                    });
                 }
             })
         }
