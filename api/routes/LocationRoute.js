@@ -133,7 +133,7 @@ Router.get("/all/:orgid",async (req,res)=>{
         let rows = rowsOutput[0];
         let orgUsername = rows[0]["username"];
     
-        let wrydURL = `https://wryd.live/api/v1/locations/${orgUsername}`;
+        let wrydURL = process.env.WRYDLEARNER + `/api/v1/locations/${orgUsername}`;
     
         let wrydResponse = await axios.get(wrydURL);
     
@@ -215,7 +215,7 @@ Router.get("/friends", requireAuth ,async (req,res)=>{
         let rows = rowsOutput[0];
         let orgUsername = rows[0]["username"];
     
-        let wrydURL = `https://wryd.live/api/v1/locations/${orgUsername}`;
+        let wrydURL = process.env.WRYDLEARNER + `/api/v1/locations/${orgUsername}`;
     
         let wrydResponse = await axios.get(wrydURL);
     
@@ -260,7 +260,7 @@ Router.get("/test",async (req,res)=>{
 
 
     try {
-        let wrydURL = `https://wryd.live/api/v1/locations/demoiiit`;
+        let wrydURL = process.env.WRYDLEARNER + `/api/v1/locations/demoiiit`;
     
         let wrydResponse = await axios.get(wrydURL);
         
