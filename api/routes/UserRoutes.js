@@ -81,7 +81,7 @@ Router.post('/create', async(req, res) => {
     else
     {
         verificationKey=CreateVerificationKey();
-        const imageurl= `https://api.multiavatar.com/${name}`;
+        const imageurl= `https://api.multiavatar.com/${name}.png`;
         mysqlConnection.query("INSERT INTO user (name,email,password,organization,verification_key,imageurl) VALUES (?,?,?,?,?,?)",[name,email,password,organization_id,verificationKey,imageurl],(err,rows,fields)=>{
             if(err)
             {
@@ -241,7 +241,7 @@ Router.delete("/dp",requireAuth,(req,res)=>{
             else
             {
                 const name=rows1[0]["name"];
-                const imageurl=`https://api.multiavatar.com/${name}`;
+                const imageurl=`https://api.multiavatar.com/${name}.png`;
                 mysqlConnection.query("UPDATE user SET imageurl=? WHERE id=?",[imageurl,userid],(err,rows,fields)=>{
                     if(err){
                         console.log(err);
