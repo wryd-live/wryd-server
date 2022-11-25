@@ -69,6 +69,12 @@ app.get('/template/verification',(req,res)=>{
 });
 
 
+app.get('/privacy-policy',(req,res)=>{
+
+    res.sendFile("privacy-policy.html",{root: path.join(__dirname, '/public/pages')});
+});
+
+
 app.get("*",(req,res)=>{
     res.status(404);
     res.send("Error 404 - Page Not Found");
