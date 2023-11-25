@@ -5,6 +5,7 @@ const mysqlConnection = require("../utils/connection");
 const {LOGIN_MAXAGE} = require("../utils/config");
 require('dotenv').config();
 
+// function searchUser(email, password) {
 
 function searchUser(email, password) {
 
@@ -19,7 +20,7 @@ function searchUser(email, password) {
                 //[rows , error]
                 resolve([rows,null]);
             }
-            
+
             else
             {
                 resolve([null,404]);
