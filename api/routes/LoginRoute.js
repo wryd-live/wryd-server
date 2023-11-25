@@ -19,6 +19,7 @@ function searchUser(email, password) {
                 //[rows , error]
                 resolve([rows,null]);
             }
+            
             else
             {
                 resolve([null,404]);
